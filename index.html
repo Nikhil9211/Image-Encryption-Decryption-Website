@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Image Secret Messenger</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔐 Image Secret Messenger</h1>
+
+<input type="file" id="imageInput">
+
+<textarea id="message" placeholder="Enter your secret message"></textarea>
+
+<button onclick="encrypt()">Encrypt Message Into Image</button>
+
+<button onclick="decrypt()">Decrypt Message From Image</button>
+
+<img id="preview">
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
