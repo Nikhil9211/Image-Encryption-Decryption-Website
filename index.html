@@ -12,6 +12,7 @@
 
 <div class="app">
 
+
 <h1>CYBERSTEGO</h1>
 <p>Encrypt secret messages inside images</p>
 
@@ -21,6 +22,7 @@
 </div>
 
 <textarea id="message" placeholder="Secret message"></textarea>
+<p id="capacityInfo">Upload an image to see message capacity</p>
 
 <input type="password" id="password" placeholder="Encryption password">
 
@@ -58,7 +60,7 @@ that human eyes cannot detect.
 
 </section>
 
-
+<!--IMAGE COMPARISON-->
 <section class="comparison">
 
 <h2>Image Comparison</h2>
@@ -93,7 +95,34 @@ that human eyes cannot detect.
 
 </section>
 
+<!-- HEATMAP -->
 
+<section class="heatmap">
+
+<h2>Pixel Heatmap</h2>
+
+<p>Shows which pixels changed during encryption.</p>
+
+<button onclick="generateHeatmap()">Generate Heatmap</button>
+
+<canvas id="heatmapCanvas"></canvas>
+
+</section>
+
+<!--TERMINAL-->
+<section class="terminal">
+
+<h2>Encryption Terminal</h2>
+
+<div class="console" id="console">
+<p>> System initialized...</p>
+</div>
+
+<button onclick="runHackSimulation()">Run Encryption Simulation</button>
+
+</section>
+ 
+<!-- SECURITY SECTION -->
 <section class="security">
 
 <h2>Security Information</h2>
@@ -125,6 +154,7 @@ JavaScript image processing, and modern web design.
 
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="script.js"></script>
 
 </body>
