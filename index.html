@@ -2,29 +2,128 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Image Secret Messenger</title>
+<title>CyberStego</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
+<canvas id="matrix"></canvas>
 
-<h1>🔐 Image Secret Messenger</h1>
+<div class="app">
 
+<h1>CYBERSTEGO</h1>
+<p>Encrypt secret messages inside images</p>
+
+<div class="upload" id="dropArea">
 <input type="file" id="imageInput">
+<p>Drop image or click to upload</p>
+</div>
 
-<textarea id="message" placeholder="Enter your secret message"></textarea>
+<textarea id="message" placeholder="Secret message"></textarea>
 
-<button onclick="encrypt()">Encrypt Message Into Image</button>
+<input type="password" id="password" placeholder="Encryption password">
 
-<button onclick="decrypt()">Decrypt Message From Image</button>
+<div class="controls">
+<button onclick="encrypt()">Encrypt Image</button>
+<button onclick="decrypt()">Decrypt Image</button>
+</div>
+
+<div class="progress">
+<div id="progressBar"></div>
+</div>
 
 <img id="preview">
+
+<div class="output">
+<p id="decodedText"></p>
+<button onclick="downloadImage()">Download Image</button>
+</div>
 
 <canvas id="canvas"></canvas>
 
 </div>
+
+
+<!--WORK INFO-->
+<section class="info">
+
+<h2>How Image Encryption Works</h2>
+
+<p>
+This tool hides secret messages inside images using steganography.
+Instead of visibly altering the image, it changes tiny pixel values
+that human eyes cannot detect.
+</p>
+
+</section>
+
+
+<section class="comparison">
+
+<h2>Image Comparison</h2>
+
+<div class="compare-box">
+
+<div>
+<h3>Original Image</h3>
+<img id="originalPreview">
+</div>
+
+<div>
+<h3>Encrypted Image</h3>
+<img id="preview">
+</div>
+
+</div>
+
+</section>
+
+<!--  ANALYZER  -->
+
+<section class="analyzer">
+
+<h2>Pixel Analyzer</h2>
+
+<p>Analyze pixel differences after encryption.</p>
+
+<button onclick="analyzePixels()">Run Pixel Analysis</button>
+
+<p id="analysisResult"></p>
+
+</section>
+
+
+<section class="security">
+
+<h2>Security Information</h2>
+
+<p>
+The hidden message is encoded inside pixel data using binary conversion.
+Only users with the correct password can decrypt the hidden message.
+</p>
+
+</section>
+
+
+<section class="developer">
+
+<h2>About the Developer</h2>
+
+<p>
+This project demonstrates concepts of cybersecurity, steganography,
+JavaScript image processing, and modern web design.
+</p>
+
+</section>
+
+
+<footer>
+
+<p>Image Encryption Tool</p>
+<p>Made By NIKHIL KUSHWAHA</p>
+
+</footer>
 
 <script src="script.js"></script>
 
