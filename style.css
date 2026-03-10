@@ -144,3 +144,62 @@ background:rgba(0,0,0,0.7);
 border-radius:10px;
 box-shadow:0 0 20px #00ff9c44;
 }
+
+.terminal{
+width:800px;
+margin:auto;
+margin-top:80px;
+padding:40px;
+background:rgba(0,0,0,0.9);
+border-radius:10px;
+box-shadow:0 0 25px #00ff9c66;
+}
+
+.console{
+background:black;
+padding:20px;
+text-align:left;
+height:200px;
+overflow:auto;
+font-size:14px;
+border:1px solid #00ff9c;
+}
+
+.console p{
+margin:5px 0;
+color:#00ff9c;
+}
+
+button{
+box-shadow:0 0 10px #00ff9c;
+transition:0.3s;
+}
+
+button:hover{
+box-shadow:0 0 20px #00ff9c;
+}
+
+.heatmap{
+width:800px;
+margin:auto;
+margin-top:80px;
+padding:40px;
+background:rgba(0,0,0,0.7);
+border-radius:10px;
+box-shadow:0 0 20px #00ff9c44;
+}
+
+#heatmapCanvas{
+max-width:100%;
+margin-top:20px;
+}
+
+#capacityInfo{
+margin-top:5px;
+font-size:14px;
+color:#00ff9c;
+}
+
+
+
+
