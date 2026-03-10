@@ -28,8 +28,8 @@ Then just download the image
 ## Encryption Process
 ![Encryption](screenshots/encryption.png)
 
-## Pixel Heatmap
-![Heatmap](screenshots/heatmap.png)
+## Pixel Analyzer
+![Heatmap](screenshots//pixel-analyzer.png)
 
 ---
 
