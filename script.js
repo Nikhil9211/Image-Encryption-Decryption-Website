@@ -42,10 +42,47 @@ setInterval(drawMatrix,33)
 
 
 
-// DRAG DROP
+// DRAG DROP //
 
 const dropArea=document.getElementById("dropArea")
 const input=document.getElementById("imageInput")
+
+// CAPACITY CODE //
+
+input.addEventListener("change", calculateCapacity)
+document.getElementById("message").addEventListener("input", calculateCapacity)
+
+function calculateCapacity(){
+
+let file = input.files[0]
+
+if(!file) return
+
+let reader = new FileReader()
+
+reader.onload = function(e){
+
+let img = new Image()
+img.src = e.target.result
+
+img.onload = function(){
+
+let maxBytes = (img.width * img.height)
+
+let messageLength = document.getElementById("message").value.length
+
+let remaining = maxBytes - messageLength
+
+document.getElementById("capacityInfo").innerText =
+"Capacity: " + maxBytes + " characters | Used: " + messageLength + " | Remaining: " + remaining
+
+}
+
+}
+
+reader.readAsDataURL(file)
+
+}
 
 dropArea.addEventListener("click",()=>input.click())
 
@@ -90,7 +127,9 @@ let file=input.files[0]
 let message=document.getElementById("message").value
 let password=document.getElementById("password").value
 
-let final=password+"|"+message
+let encryptedMessage = CryptoJS.AES.encrypt(message, password).toString()
+
+let final = password + "|" + encryptedMessage
 
 let reader=new FileReader()
 
@@ -100,7 +139,8 @@ let img=new Image()
 img.src=e.target.result
 
 img.onload=function(){
-    document.getElementById("originalPreview").src = img.src
+
+document.getElementById("originalPreview").src = img.src
 
 let canvas=document.getElementById("canvas")
 let ctx=canvas.getContext("2d")
@@ -120,8 +160,31 @@ binary+=final.charCodeAt(i).toString(2).padStart(8,"0")
 
 binary+="1111111111111110"
 
-for(let i=0;i<binary.length;i++)
-data[i*4]=(data[i*4]&254)|binary[i]
+let maxBytes = data.length / 4
+
+if(binary.length > maxBytes){
+alert("Message too large for this image.")
+return
+}
+
+// WRITE DATA INTO PIXELS //
+
+let pixelIndex = 0
+
+for(let i = 0; i < binary.length; i++){
+
+if(pixelIndex >= data.length){
+alert("Image capacity exceeded!")
+return
+}
+
+let bit = binary[i]
+
+data[pixelIndex] = (data[pixelIndex] & 254) | parseInt(bit)
+
+pixelIndex += 4
+
+}
 
 ctx.putImageData(imageData,0,0)
 
@@ -144,7 +207,7 @@ reader.readAsDataURL(file)
 
 
 
-// DECRYPT
+// DECRYPT //
 
 function decrypt(){
 
@@ -171,8 +234,11 @@ let data=ctx.getImageData(0,0,canvas.width,canvas.height).data
 
 let binary=""
 
-for(let i=0;i<data.length;i+=4)
-binary+=(data[i]&1)
+for(let i = 0; i < data.length; i += 4){
+
+binary += (data[i] & 1)
+
+}
 
 let chars=[]
 
@@ -195,7 +261,11 @@ let hidden=parts[1]
 let entered=prompt("Enter password")
 
 if(entered===saved){
-document.getElementById("decodedText").innerText=hidden
+let decrypted = CryptoJS.AES.decrypt(hidden, entered)
+
+let finalMessage = decrypted.toString(CryptoJS.enc.Utf8)
+
+document.getElementById("decodedText").innerText = finalMessage
 }else{
 alert("Wrong password")
 }
@@ -275,3 +345,107 @@ document.getElementById("analysisResult").innerText =
 }
 
 }
+
+function runHackSimulation(){
+
+let consoleBox = document.getElementById("console")
+
+let logs = [
+"> Connecting to encryption module...",
+"> Initializing pixel encoder...",
+"> Converting message to binary...",
+"> Injecting binary into pixel data...",
+"> Running steganography algorithm...",
+"> Encrypting image layers...",
+"> Verifying hidden payload...",
+"> Encryption complete."
+]
+
+let i = 0
+
+let interval = setInterval(()=>{
+
+if(i >= logs.length){
+clearInterval(interval)
+return
+}
+
+let p = document.createElement("p")
+p.textContent = logs[i]
+
+consoleBox.appendChild(p)
+
+consoleBox.scrollTop = consoleBox.scrollHeight
+
+i++
+
+},800)
+
+}
+
+// HEATMAP //
+
+function generateHeatmap(){
+
+let originalSrc = document.getElementById("originalPreview").src
+let encryptedSrc = document.getElementById("preview").src
+
+if(!originalSrc || !encryptedSrc){
+alert("Encrypt an image first.")
+return
+}
+
+let canvas = document.getElementById("heatmapCanvas")
+let ctx = canvas.getContext("2d")
+
+let img1 = new Image()
+let img2 = new Image()
+
+img1.src = originalSrc
+img2.src = encryptedSrc
+
+img1.onload = function(){
+
+img2.onload = function(){
+
+canvas.width = img1.width
+canvas.height = img1.height
+
+let tempCanvas = document.createElement("canvas")
+let tempCtx = tempCanvas.getContext("2d")
+
+tempCanvas.width = img1.width
+tempCanvas.height = img1.height
+
+tempCtx.drawImage(img1,0,0)
+let data1 = tempCtx.getImageData(0,0,img1.width,img1.height).data
+
+tempCtx.clearRect(0,0,tempCanvas.width,tempCanvas.height)
+
+tempCtx.drawImage(img2,0,0)
+let data2 = tempCtx.getImageData(0,0,img2.width,img2.height).data
+
+let heatmap = ctx.createImageData(canvas.width,canvas.height)
+
+for(let i=0;i<data1.length;i+=4){
+
+let diff =
+Math.abs(data1[i]-data2[i]) +
+Math.abs(data1[i+1]-data2[i+1]) +
+Math.abs(data1[i+2]-data2[i+2])
+
+heatmap.data[i] = diff
+heatmap.data[i+1] = 0
+heatmap.data[i+2] = 0
+heatmap.data[i+3] = 255
+
+}
+
+ctx.putImageData(heatmap,0,0)
+
+}
+
+}
+
+}
+
