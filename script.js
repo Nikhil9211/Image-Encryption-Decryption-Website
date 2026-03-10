@@ -1,107 +1,277 @@
+// MATRIX BACKGROUND
+
+const matrix = document.getElementById("matrix")
+const ctx = matrix.getContext("2d")
+
+matrix.height = window.innerHeight
+matrix.width = window.innerWidth
+
+let letters="01"
+letters=letters.split("")
+
+let font=14
+let columns=matrix.width/font
+let drops=[]
+
+for(let x=0;x<columns;x++) drops[x]=1
+
+function drawMatrix(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)"
+ctx.fillRect(0,0,matrix.width,matrix.height)
+
+ctx.fillStyle="#0f0"
+ctx.font=font+"px monospace"
+
+for(let i=0;i<drops.length;i++){
+
+let text=letters[Math.floor(Math.random()*letters.length)]
+
+ctx.fillText(text,i*font,drops[i]*font)
+
+if(drops[i]*font>matrix.height && Math.random()>0.975)
+drops[i]=0
+
+drops[i]++
+
+}
+
+}
+
+setInterval(drawMatrix,33)
+
+
+
+// DRAG DROP
+
+const dropArea=document.getElementById("dropArea")
+const input=document.getElementById("imageInput")
+
+dropArea.addEventListener("click",()=>input.click())
+
+dropArea.addEventListener("dragover",e=>e.preventDefault())
+
+dropArea.addEventListener("drop",e=>{
+e.preventDefault()
+input.files=e.dataTransfer.files
+})
+
+
+
+// PROGRESS
+
+function progress(){
+
+let bar=document.getElementById("progressBar")
+let width=0
+
+let interval=setInterval(()=>{
+
+if(width>=100){
+clearInterval(interval)
+}else{
+width++
+bar.style.width=width+"%"
+}
+
+},10)
+
+}
+
+
+
+// ENCRYPT
+
 function encrypt(){
 
-let file = document.getElementById("imageInput").files[0];
-let message = document.getElementById("message").value;
+progress()
 
-let reader = new FileReader();
+let file=input.files[0]
+let message=document.getElementById("message").value
+let password=document.getElementById("password").value
 
-reader.onload = function(e){
+let final=password+"|"+message
 
-let img = new Image();
-img.src = e.target.result;
+let reader=new FileReader()
 
-img.onload = function(){
+reader.onload=function(e){
 
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
+let img=new Image()
+img.src=e.target.result
 
-canvas.width = img.width;
-canvas.height = img.height;
+img.onload=function(){
+    document.getElementById("originalPreview").src = img.src
 
-ctx.drawImage(img,0,0);
+let canvas=document.getElementById("canvas")
+let ctx=canvas.getContext("2d")
 
-let imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-let data = imageData.data;
+canvas.width=img.width
+canvas.height=img.height
 
-let binaryMessage = "";
+ctx.drawImage(img,0,0)
 
-for(let i=0;i<message.length;i++){
-binaryMessage += message.charCodeAt(i).toString(2).padStart(8,"0");
-}
+let imageData=ctx.getImageData(0,0,canvas.width,canvas.height)
+let data=imageData.data
 
-binaryMessage += "1111111111111110";
+let binary=""
 
-for(let i=0;i<binaryMessage.length;i++){
-data[i*4] = (data[i*4] & 254) | binaryMessage[i];
-}
+for(let i=0;i<final.length;i++)
+binary+=final.charCodeAt(i).toString(2).padStart(8,"0")
 
-ctx.putImageData(imageData,0,0);
+binary+="1111111111111110"
 
-let encryptedImage = canvas.toDataURL();
+for(let i=0;i<binary.length;i++)
+data[i*4]=(data[i*4]&254)|binary[i]
 
-document.getElementById("preview").src = encryptedImage;
+ctx.putImageData(imageData,0,0)
 
-let a = document.createElement("a");
-a.href = encryptedImage;
-a.download = "encrypted.png";
-a.click();
+let result=canvas.toDataURL()
 
-};
+document.getElementById("preview").src=result
 
-};
-
-reader.readAsDataURL(file);
+let a=document.createElement("a")
+a.href=result
+a.download="encrypted.png"
+a.click()
 
 }
 
+}
+
+reader.readAsDataURL(file)
+
+}
+
+
+
+// DECRYPT
 
 function decrypt(){
 
-let file = document.getElementById("imageInput").files[0];
-let reader = new FileReader();
+let file=input.files[0]
 
-reader.onload = function(e){
+let reader=new FileReader()
 
-let img = new Image();
-img.src = e.target.result;
+reader.onload=function(e){
 
-img.onload = function(){
+let img=new Image()
+img.src=e.target.result
 
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
+img.onload=function(){
 
-canvas.width = img.width;
-canvas.height = img.height;
+let canvas=document.getElementById("canvas")
+let ctx=canvas.getContext("2d")
 
-ctx.drawImage(img,0,0);
+canvas.width=img.width
+canvas.height=img.height
 
-let data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+ctx.drawImage(img,0,0)
 
-let binary = "";
+let data=ctx.getImageData(0,0,canvas.width,canvas.height).data
 
-for(let i=0;i<data.length;i+=4){
-binary += (data[i] & 1);
-}
+let binary=""
 
-let chars = [];
+for(let i=0;i<data.length;i+=4)
+binary+=(data[i]&1)
+
+let chars=[]
 
 for(let i=0;i<binary.length;i+=8){
 
-let byte = binary.substr(i,8);
+let byte=binary.substr(i,8)
 
-if(byte=="11111110") break;
+if(byte=="11111110") break
 
-chars.push(String.fromCharCode(parseInt(byte,2)));
+chars.push(String.fromCharCode(parseInt(byte,2)))
+
 }
 
-let message = chars.join("");
+let decoded=chars.join("")
+let parts=decoded.split("|")
 
-alert("Hidden Message: " + message);
+let saved=parts[0]
+let hidden=parts[1]
 
-};
+let entered=prompt("Enter password")
 
-};
+if(entered===saved){
+document.getElementById("decodedText").innerText=hidden
+}else{
+alert("Wrong password")
+}
 
-reader.readAsDataURL(file);
+}
+
+}
+
+reader.readAsDataURL(file)
+
+}
+
+
+
+// DOWNLOAD IMAGE //
+
+function downloadImage(){
+
+let img = document.getElementById("preview")
+
+if(!img.src){
+alert("No image available to download")
+return
+}
+
+let a = document.createElement("a")
+a.href = img.src
+a.download = "encrypted-image.png"
+a.click()
+
+}
+
+// ANALYZER //
+
+function analyzePixels(){
+
+let original = document.getElementById("originalPreview")
+let encrypted = document.getElementById("preview")
+
+if(!original.src || !encrypted.src){
+document.getElementById("analysisResult").innerText =
+"Upload and encrypt an image first."
+return
+}
+
+let canvas = document.createElement("canvas")
+let ctx = canvas.getContext("2d")
+
+let img1 = new Image()
+let img2 = new Image()
+
+img1.src = original.src
+img2.src = encrypted.src
+
+img1.onload = function(){
+
+canvas.width = img1.width
+canvas.height = img1.height
+
+ctx.drawImage(img1,0,0)
+let data1 = ctx.getImageData(0,0,canvas.width,canvas.height).data
+
+ctx.drawImage(img2,0,0)
+let data2 = ctx.getImageData(0,0,canvas.width,canvas.height).data
+
+let diff = 0
+
+for(let i=0;i<data1.length;i++){
+if(data1[i] !== data2[i]){
+diff++
+}
+}
+
+document.getElementById("analysisResult").innerText =
+"Modified Pixels: " + diff
+
+}
 
 }
